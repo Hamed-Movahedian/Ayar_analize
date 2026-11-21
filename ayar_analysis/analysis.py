@@ -98,7 +98,7 @@ def analyze(
     timeframe: Timeframe,
     config: AnalysisConfig,
 ) -> Analysis:
-    """Build sessions from dates traded in both Ayar and 18-karat gold.
+    """Build sessions whose Ayar interval contains a gold candle.
 
     Gold VWAP uses every gold candle in the inclusive Ayar session interval.
     Gold normalized candles use the exact intersection of the two timestamps.
@@ -106,12 +106,11 @@ def analyze(
     """
     issues: list[Issue] = []
     sessions: list[TradingSession] = []
-    gold_dates = set(gold.index.date)
     for day, ayar_day in ayar.groupby(ayar.index.date, sort=True):
-        if day not in gold_dates:
-            continue
         start, end = ayar_day.index[0], ayar_day.index[-1]
         gold_window = gold.loc[start:end]
+        if gold_window.empty:
+            continue
         aligned = gold_window.loc[gold_window.index.isin(ayar_day.index)]
         day_text = jalali_date(day)
         missing_count = len(ayar_day) - len(aligned)
@@ -150,8 +149,8 @@ def analyze(
 
     if not sessions:
         raise AnalysisError(
-            "No common trading day exists: Ayar and 18-karat gold have no "
-            "date in common."
+            "No common trading session exists: no gold candle falls inside "
+            "any Ayar trading interval."
         )
 
     rows = []

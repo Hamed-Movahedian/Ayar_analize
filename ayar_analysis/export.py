@@ -104,8 +104,8 @@ def export_analysis(
             "configuration": asdict(config),
             "timeframe": asdict(analysis.timeframe),
             "policies": {
-                "session": "Dates traded in both Ayar and 18-karat gold; "
-                "first through last Ayar candle, inclusive, per local date",
+                "session": "First through last Ayar candle, inclusive, per local date; "
+                "at least one gold candle must fall inside that interval",
                 "boundary_prices": "Exact timestamp: first open and last close",
                 "vwap": "sum(candle_price * volume) / sum(volume)",
                 "gold_vwap_selection": "All gold candles in the Ayar session window",

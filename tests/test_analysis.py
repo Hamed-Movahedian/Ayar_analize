@@ -34,6 +34,7 @@ def test_session_comparison_uses_ayar_dates_and_exact_gold_intersection():
             (pd.Timestamp("2025-01-02 11:00"), 106, 110, 104, 108, 1),
             (pd.Timestamp("2025-01-02 11:05"), 108, 112, 106, 110, 1),
             (pd.Timestamp("2025-01-03 11:00"), 110, 114, 108, 112, 1),
+            (pd.Timestamp("2025-01-04 10:00"), 112, 116, 110, 114, 1),
         ]
     )
     ayar = frame(
@@ -55,8 +56,6 @@ def test_session_comparison_uses_ayar_dates_and_exact_gold_intersection():
     assert len(analysis.table) == 1
     assert analysis.table.iloc[0]["ayar_previous_close"] == 10
     assert analysis.table.iloc[0]["ayar_open"] == 12
-    # The current gold VWAP window is empty, because there is no gold candle
-    # between 2025-01-03 11:00 and itself? It is exactly one candle, so it is present.
     assert len(analysis.sessions[1].gold_aligned) == 1
     assert any(issue.code == "missing_aligned_candles" for issue in analysis.issues)
 
@@ -64,7 +63,7 @@ def test_session_comparison_uses_ayar_dates_and_exact_gold_intersection():
 def test_no_common_trading_day_is_rejected():
     gold = frame([(pd.Timestamp("2025-01-01 11:00"), 100, 101, 99, 100, 1)])
     ayar = frame([(pd.Timestamp("2025-01-02 11:00"), 10, 11, 9, 10, 1)])
-    with pytest.raises(AnalysisError, match="No common trading day"):
+    with pytest.raises(AnalysisError, match="No common trading session"):
         analyze(gold, ayar, Timeframe(5, "test", 5, 5), AnalysisConfig())
 
 
