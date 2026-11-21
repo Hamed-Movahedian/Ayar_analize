@@ -1,0 +1,85 @@
+{
+  "version": "2.0.0",
+  "options": {
+    "cwd": "${workspaceFolder}",
+    "env": { "PYTHONUTF8": "1" }
+  },
+  "tasks": [
+    {
+      "label": "Create virtual environment",
+      "type": "process",
+      "command": "python",
+      "args": ["-m", "venv", ".venv"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Install development dependencies",
+      "type": "process",
+      "command": "${workspaceFolder}/.venv/bin/python",
+      "windows": { "command": "${workspaceFolder}/.venv/Scripts/python.exe" },
+      "args": ["-m", "pip", "install", "-r", "requirements-dev.txt"],
+      "dependsOn": "Create virtual environment",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run example",
+      "type": "process",
+      "command": "${workspaceFolder}/.venv/bin/python",
+      "windows": { "command": "${workspaceFolder}/.venv/Scripts/python.exe" },
+      "args": ["-m", "ayar_analysis", "--gold", "examples/gold.csv", "--ayar", "examples/ayar.csv", "--output", "output"],
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run analysis",
+      "type": "process",
+      "command": "${workspaceFolder}/.venv/bin/python",
+      "windows": { "command": "${workspaceFolder}/.venv/Scripts/python.exe" },
+      "args": ["-m", "ayar_analysis", "--gold", "${input:goldPath}", "--ayar", "${input:ayarPath}", "--output", "${input:outputPath}"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Test",
+      "type": "process",
+      "command": "${workspaceFolder}/.venv/bin/python",
+      "windows": { "command": "${workspaceFolder}/.venv/Scripts/python.exe" },
+      "args": ["-m", "pytest"],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Lint",
+      "type": "process",
+      "command": "${workspaceFolder}/.venv/bin/python",
+      "windows": { "command": "${workspaceFolder}/.venv/Scripts/python.exe" },
+      "args": ["-m", "ruff", "check", "."],
+      "problemMatcher": []
+    },
+    {
+      "label": "Check formatting",
+      "type": "process",
+      "command": "${workspaceFolder}/.venv/bin/python",
+      "windows": { "command": "${workspaceFolder}/.venv/Scripts/python.exe" },
+      "args": ["-m", "ruff", "format", "--check", "."],
+      "problemMatcher": []
+    },
+    {
+      "label": "Format",
+      "type": "process",
+      "command": "${workspaceFolder}/.venv/bin/python",
+      "windows": { "command": "${workspaceFolder}/.venv/Scripts/python.exe" },
+      "args": ["-m", "ruff", "format", "."],
+      "problemMatcher": []
+    },
+    {
+      "label": "Validate",
+      "dependsOn": ["Test", "Lint", "Check formatting"],
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    { "id": "goldPath", "type": "promptString", "description": "18-karat gold CSV path", "default": "data/gold.csv" },
+    { "id": "ayarPath", "type": "promptString", "description": "Ayar fund CSV path", "default": "data/ayar.csv" },
+    { "id": "outputPath", "type": "promptString", "description": "Output parent folder", "default": "output" }
+  ]
+}

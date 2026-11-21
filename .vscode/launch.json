@@ -1,0 +1,32 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug example",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "ayar_analysis",
+      "args": ["--gold", "examples/gold.csv", "--ayar", "examples/ayar.csv", "--output", "output"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": { "PYTHONUTF8": "1" }
+    },
+    {
+      "name": "Debug analysis",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "ayar_analysis",
+      "args": ["--gold", "${input:goldPath}", "--ayar", "${input:ayarPath}", "--output", "${input:outputPath}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": { "PYTHONUTF8": "1" }
+    }
+  ],
+  "inputs": [
+    { "id": "goldPath", "type": "promptString", "description": "18-karat gold CSV path", "default": "data/gold.csv" },
+    { "id": "ayarPath", "type": "promptString", "description": "Ayar fund CSV path", "default": "data/ayar.csv" },
+    { "id": "outputPath", "type": "promptString", "description": "Output parent folder", "default": "output" }
+  ]
+}

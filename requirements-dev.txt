@@ -1,0 +1,2 @@
+# Includes the runtime dependencies, pytest, and Ruff.
+-e .[dev]
