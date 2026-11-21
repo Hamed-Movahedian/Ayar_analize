@@ -67,6 +67,37 @@ def test_no_common_trading_day_is_rejected():
         analyze(gold, ayar, Timeframe(5, "test", 5, 5), AnalysisConfig())
 
 
+def test_gold_boundary_prices_fall_back_before_or_after_boundary():
+    gold = frame(
+        [
+            (pd.Timestamp("2025-01-01 11:00"), 100, 104, 98, 102, 1),
+            (pd.Timestamp("2025-01-02 11:05"), 110, 114, 108, 112, 1),
+        ]
+    )
+    ayar = frame(
+        [
+            (pd.Timestamp("2025-01-01 11:00"), 10, 11, 9, 10, 1),
+            (pd.Timestamp("2025-01-01 11:05"), 10, 11, 9, 10, 1),
+            (pd.Timestamp("2025-01-02 11:00"), 12, 13, 11, 12, 1),
+            (pd.Timestamp("2025-01-02 11:05"), 12, 13, 11, 12, 1),
+        ]
+    )
+    analysis = analyze(
+        gold,
+        ayar,
+        Timeframe(5, "test", 5, 5),
+        AnalysisConfig(),
+    )
+    row = analysis.table.iloc[0]
+    assert row["gold_previous_close"] == 102
+    assert row["gold_open"] == 110
+    assert not any(
+        issue.code in {"missing_open_boundary", "missing_close_boundary"}
+        and issue.asset == "gold"
+        for issue in analysis.issues
+    )
+
+
 def test_normalization_preserves_volume_and_drops_unavailable_reference():
     candles = frame([(pd.Timestamp("2025-01-01 11:00"), 10, 12, 8, 11, 7)])
     normalized = normalize_candles(candles, 10)

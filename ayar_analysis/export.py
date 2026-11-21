@@ -106,7 +106,10 @@ def export_analysis(
             "policies": {
                 "session": "First through last Ayar candle, inclusive, per local date; "
                 "at least one gold candle must fall inside that interval",
-                "boundary_prices": "Exact timestamp: first open and last close",
+                "boundary_prices": "Ayar uses exact start open and end close. "
+                "Gold uses exact values when present; otherwise previous-day close "
+                "falls back to the last close before the end boundary and current-day "
+                "open falls forward to the first open after the start boundary.",
                 "vwap": "sum(candle_price * volume) / sum(volume)",
                 "gold_vwap_selection": "All gold candles in the Ayar session window",
                 "gold_normalized_selection": "Exact timestamp intersection with Ayar",

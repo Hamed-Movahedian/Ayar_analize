@@ -46,6 +46,19 @@ def _session_stats(
     issues: list[Issue],
 ) -> SessionStats:
     def boundary(timestamp: pd.Timestamp, field: str) -> float | None:
+        if timestamp in candles.index:
+            return float(candles.at[timestamp, field])
+
+        fallback: pd.DataFrame
+        if asset == "gold" and field == "close":
+            fallback = candles.loc[candles.index < timestamp]
+            if not fallback.empty:
+                return float(fallback.iloc[-1][field])
+        elif asset == "gold" and field == "open":
+            fallback = candles.loc[candles.index > timestamp]
+            if not fallback.empty:
+                return float(fallback.iloc[0][field])
+
         if timestamp not in candles.index:
             issues.append(
                 Issue(
@@ -57,7 +70,6 @@ def _session_stats(
                 )
             )
             return None
-        return float(candles.at[timestamp, field])
 
     opening = boundary(start, "open")
     closing = boundary(end, "close")
