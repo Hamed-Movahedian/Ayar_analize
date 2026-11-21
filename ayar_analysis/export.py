@@ -22,12 +22,15 @@ from ayar_analysis.models import (
 def _write_candles(candles: pd.DataFrame, path: Path, header: bool) -> None:
     data = candles.copy()
     data.insert(0, "time", data.index.strftime("%H:%M"))
+    for column in NORMALIZED_COLUMNS[1:]:
+        data[column] = data[column].astype(float)
     data.to_csv(
         path,
         columns=NORMALIZED_COLUMNS,
         index=False,
         header=header,
         encoding="utf-8",
+        float_format="%.6f",
         lineterminator="\n",
     )
 
@@ -63,6 +66,7 @@ def export_analysis(
             index=False,
             encoding="utf-8",
             na_rep="",
+            float_format="%.6f",
             lineterminator="\n",
         )
         for previous, current in zip(sessions, sessions[1:], strict=False):
